@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+__pycache__/
+*.pyc
+venv/
+# runtime data
+backend/data/
+ai-services/chroma_db/

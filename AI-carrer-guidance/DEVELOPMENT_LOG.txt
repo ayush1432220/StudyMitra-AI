@@ -1,0 +1,48 @@
+================================================================================
+                    APEXFORGE / CAREER AI - DEVELOPMENT LOG
+================================================================================
+This document contains a comprehensive summary of all architectural changes, 
+feature integrations, UI/UX overhauls, and bug fixes applied to the platform.
+
+--------------------------------------------------------------------------------
+1. ARCHITECTURE & BACKEND INFRASTRUCTURE
+--------------------------------------------------------------------------------
+- Database Migration: Transitioned from a guest-only ephemeral state to a persistent SQLite3 backend database. Implemented user-specific data storage for profile info, chat histories, to-do lists, and gamification metrics.
+- Authentication System: Implemented a mandatory Auth Wall. Users must register/login to access the platform. Added secure session handling via Flask (`/api/auth/login`, `/api/auth/register`, `/api/auth/logout`).
+- Multi-Hub Framework: Restructured the backend and frontend to support 8 core navigation pillars: Dashboard, Career Guidance, Learning Resources, Project Ideas, Interview & Resume, Need Help (Community), Admin Insights, and Responsible AI.
+- Gamification Engine: Created a robust backend system (`/api/gamification/stats`, `/api/gamification/update`) to track user engagement. Integrated a persistent points system, leveling, streaks, and a community leaderboard.
+
+--------------------------------------------------------------------------------
+2. AI & RAG (RETRIEVAL-AUGMENTED GENERATION) CAPABILITIES
+--------------------------------------------------------------------------------
+- Sarvam AI Pipeline Integration: Integrated the Sarvam AI ecosystem as the primary intelligence layer.
+- RAG Implementation: Built a ChromaDB-backed Retrieval-Augmented Generation system. The AI dynamically pulls context from over 4,900 document chunks to answer career-related queries accurately.
+- Hallucination & Honesty Policy: Implemented strict guidelines and relevance thresholds (`RELEVANCE_THRESHOLD`). If a query is completely out of scope, the system automatically returns a graceful "Honest Refusal" message rather than hallucinating an answer.
+- Fallback Redundancy: Configured the backend to instantly fall back to Groq (LLaMA 3) if the Sarvam AI API experiences latency or timeouts (specifically capping Sarvam's wait time to 15 seconds to prevent frontend hanging).
+
+--------------------------------------------------------------------------------
+3. MULTIMEDIA & ACCESSIBILITY MODULES
+--------------------------------------------------------------------------------
+- Optical Character Recognition (OCR): Enabled users to upload images and PDF documents directly into the AI Mentor chat. The backend digitizes these files, extracts text using vision models, and injects it into the LLM context for analysis (e.g., Resume reviewing).
+- Speech-to-Text (STT): Added microphone integration across the chat and community hubs, allowing users to dictate queries using voice input via Sarvam's speech models.
+- Text-to-Speech (TTS): Implemented a "Speak" button on all AI responses. Users can click this to hear the AI's guidance spoken aloud.
+- Multilingual Support: Integrated the Google Translate widget directly into the platform header, allowing students to seamlessly translate the entire dashboard and chat interface into multiple regional languages.
+
+--------------------------------------------------------------------------------
+4. FRONTEND UI/UX OVERHAUL (LIQUID-GLASS DESIGN SYSTEM)
+--------------------------------------------------------------------------------
+- Glassmorphism Aesthetic: Completely redesigned the platform using a modern, premium "liquid-glass" (glassmorphism) design system. Implemented frosted glass panels, vibrant gradient backgrounds, and refined typography.
+- Repositioned Branding: Removed legacy branding and established "ApexForge" as the primary identity, ensuring a high-end, professional finish tailored for Indian engineering students.
+- Fixed-Height Workspace Tiles: Overhauled the layout of interactive hubs (like the "Need Help" Community Q&A and AI Mentor tabs) to use fixed-height (650px) scrollable containers. This resolved page expansion bugs and ensured the UI remains static and clean during long chat sessions.
+- Dynamic Visuals: Added an interactive Infographic Chart Generator inside chat bubbles for visual data representation, and a collapsible UI for viewing raw extracted OCR text.
+
+--------------------------------------------------------------------------------
+5. CRITICAL BUG FIXES & REFINEMENTS
+--------------------------------------------------------------------------------
+- RAG "Thinking..." Hang Fix: Diagnosed and resolved an issue where specific user queries caused the backend LLM request to hang. Fixed by reducing the Sarvam API timeout to 15 seconds and ensuring the Groq fallback triggers instantly to keep the UI responsive.
+- Chat Scoping Resolution: Fixed a JavaScript scoping error where core RAG functions (`sendCoachMessage`, `renderCurrentChatMessages`) were locked inside the main chat tab. Exported these to the global `window` object so the AI Mentor operates flawlessly across all platform tabs (including the Community Hub).
+- Logout & Authentication State Fix: Repaired a broken logout flow. The logout button in the profile dropdown was attempting to call an undefined function, and the header button was hidden when logged in. Centralized the logic into a global `handleLogout` function, ensuring users can securely sign out and the Auth Wall modal re-triggers correctly.
+
+================================================================================
+                    STATUS: SYSTEM FULLY OPERATIONAL
+================================================================================

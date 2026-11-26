@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: apexforge-api
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 4 -b 0.0.0.0:$PORT app:app
+    disk:
+      name: data
+      mountPath: /opt/render/project/data
+      sizeGB: 1
+    envVars:
+      - key: DB_PATH
+        value: /opt/render/project/data/users.db
+      - key: CHROMA_PATH
+        value: /opt/render/project/data/chroma_db
+      - key: LOG_FILE
+        value: /opt/render/project/data/metrics.log
